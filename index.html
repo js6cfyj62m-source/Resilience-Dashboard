@@ -463,6 +463,15 @@
   <script>
 let projectData = null;
 
+fetch('DATA_LOG.json')
+  .then(response => response.json())
+  .then(data => {
+      loadProjectData(data);
+  })
+  .catch(err => {
+      console.error("Failed to load DATA_LOG.json:", err);
+  });
+	  
 function loadProjectData(data) {
   projectData = data;
   document.getElementById('no-data-banner').style.display = 'none';
