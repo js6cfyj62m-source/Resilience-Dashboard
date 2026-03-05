@@ -1,1 +1,26 @@
+name: Update DATA_LOG
 
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/10 * * * *"
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Pull latest log
+        run: |
+          echo "Updating DATA_LOG.json"
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add DATA_LOG.json
+          git commit -m "Auto update DATA_LOG" || echo "No changes"
+          git push
