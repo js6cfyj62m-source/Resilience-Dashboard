@@ -1,24 +1,24 @@
 name: Update DATA_LOG
 
 on:
-  workflow_dispatch:
-  
+  repository_dispatch:
+    types: [update_data_log]
+
 jobs:
-  update-json:
+  update:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Pull latest log
+      - name: Write JSON
         run: |
-          echo "Updating DATA_LOG.json"
+          echo '${{ github.event.client_payload.data }}' > DATA_LOG.json
 
-      - name: Commit changes
+      - name: Commit
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+          git config --global user.name "automation"
+          git config --global user.email "bot@github.com"
           git add DATA_LOG.json
-          git commit -m "Auto update DATA_LOG" || echo "No changes"
+          git commit -m "Update DATA_LOG.json" || echo "No changes"
           git push
