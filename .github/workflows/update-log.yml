@@ -12,6 +12,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Write JSON
+        if: github.event.client_payload.data != ''
         run: |
           echo '${{ github.event.client_payload.data }}' > DATA_LOG.json
 
