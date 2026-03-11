@@ -241,14 +241,14 @@
       <!-- Quick Stats -->
       <div class="quick-stats">
         <div class="quick-stat-card">
-          <div class="quick-stat-label">TRAINING</div>
+          <div class="quick-stat-label">WALK SESSION</div>
           <div class="quick-stat-value"><span id="totalTrainingHours">116</span>h<br><span id="totalTrainingMinutes">41</span>m</div>
           <div class="quick-stat-unit" id="totalDistance">535.61 km</div>
         </div>
         <div class="quick-stat-card">
           <div class="quick-stat-label">CONSISTENCY</div>
           <div class="quick-stat-value accent" id="consistency">--</div>
-          <div class="quick-stat-unit">unbroken<br>training</div>
+          <div class="quick-stat-unit">unbroken<br>walking</div>
         </div>
         <div class="quick-stat-card">
           <div class="quick-stat-label">CALORIES</div>
@@ -335,7 +335,7 @@
       <div class="analysis-section" id="performanceSection">
         <div class="analysis-title" id="projectTotalsTitle"></div>
         <div class="analysis-grid">
-          <div><div class="analysis-item-label">Training</div><div class="analysis-item-value" id="perfTraining">--</div></div>
+          <div><div class="analysis-item-label">Walk Session</div><div class="analysis-item-value" id="perfTraining">--</div></div>
           <div><div class="analysis-item-label">Distance</div><div class="analysis-item-value" id="perfDistance">535.61 km</div></div>
           <div><div class="analysis-item-label">Steps</div><div class="analysis-item-value" id="perfSteps">813,160</div></div>
           <div><div class="analysis-item-label">Calories</div><div class="analysis-item-value" id="perfCalories">--</div></div>
@@ -377,12 +377,12 @@
       <!-- Analytics Section -->
       <div class="analysis-section" id="analyticsSection">
         <div class="chart-container">
-          <div class="chart-title">TRAINING LOAD OVERVIEW</div>
+          <div class="chart-title">WALK SESSION OVERVIEW</div>
           <canvas id="trainingChart" class="chart-canvas"></canvas>
         </div>
         <div class="analysis-box blue">
           <div class="box-title">💙 RECOVERY BALANCE ANALYSIS</div>
-          <p>Your training load averages <span id="avgTraining">1.17</span>h per day, paired with <span id="recoveryBalance">80.9</span>% sleep restfulness. This balance indicates your body is recovering efficiently between sessions.</p>
+          <p>Your walk session averages <span id="avgTraining">1.17</span>h per day, paired with <span id="recoveryBalance">80.9</span>% sleep restfulness. This balance indicates your body is recovering efficiently between walks.</p>
         </div>
 
         <div class="chart-container">
@@ -416,7 +416,7 @@
             <div class="analysis-item-label" style="margin-top: 4px;">bpm</div>
           </div>
           <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;" id="trendsRHRComp">This week: 81.7 | Last week: 84.3 | Change: -2.6 bpm (-3.1%)</div>
-          <div style="font-size: 12px; color: #e2e8f0; line-height: 1.5; margin-top: 8px;" id="trendsRHRInt">IMPROVING: Your heart is recovering better. It's working 2.6 bpm less hard at baseline, showing your cardiovascular system adapted well to training.</div>
+          <div style="font-size: 12px; color: #e2e8f0; line-height: 1.5; margin-top: 8px;" id="trendsRHRInt">IMPROVING: Your heart is recovering better. It's working 2.6 bpm less hard at baseline, showing your cardiovascular system adapted well to daily walking.</div>
         </div>
         
         <!-- Daily Drift -->
@@ -438,7 +438,7 @@
             <div class="analysis-item-label" style="margin-top: 4px;" id="trendsHRVUnit">ms</div>
           </div>
           <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;" id="trendsHRVPattern">Pattern: STABLE</div>
-          <div style="font-size: 12px; color: #e2e8f0; line-height: 1.5; margin-top: 8px;" id="trendsHRVInt">STABLE: Your parasympathetic (calm) nervous system is recovering consistently during sleep. No signs of overtraining or stress-induced disruption.</div>
+          <div style="font-size: 12px; color: #e2e8f0; line-height: 1.5; margin-top: 8px;" id="trendsHRVInt">STABLE: Your parasympathetic (calm) nervous system is recovering consistently during sleep. No signs of over-exertion or stress-induced disruption.</div>
         </div>
         
         <!-- Overall Pattern -->
@@ -447,7 +447,7 @@
           <div style="font-size: 12px; color: #e2e8f0; line-height: 1.6; margin-top: 8px;" id="trendsOverallPattern">Recovery improving, daily stress well-managed, sleep recovery consistent.</div>
           <div style="background: rgba(6, 78, 59, 0.4); border: 1px solid #059669; border-radius: 6px; padding: 10px; margin-top: 10px;">
             <div style="font-size: 11px; font-weight: 600; color: #6ee7b7; text-transform: uppercase; margin-bottom: 4px;">▶ RECOMMENDATION</div>
-            <div style="font-size: 12px; color: #e2e8f0;" id="trendsRecommendation">Continue current training intensity. Recovery is working well.</div>
+            <div style="font-size: 12px; color: #e2e8f0;" id="trendsRecommendation">Continue current walk intensity. Recovery is working well.</div>
           </div>
         </div>
       </div>
@@ -693,7 +693,7 @@ function handleFileUpload(file) {
           <div class="day-expanded">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 12px; color: #cbd5e1; line-height: 1.6;">
               <div>
-                <div style="color: #94a3b8; font-size: 10px; text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">TRAINING</div>
+                <div style="color: #94a3b8; font-size: 10px; text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">WALK SESSION</div>
                 <div style="color: white; font-weight: 600;">${day.training.duration} | ${day.training.distance} km</div>
               </div>
               <div>
@@ -843,7 +843,7 @@ function handleFileUpload(file) {
           type: 'bar',
           data: {
             labels: trainingData.map(d => d.day),
-            datasets: [{ label: 'Training Hours', data: trainingData.map(d => d.training.toFixed(2)), backgroundColor: '#3b82f6', borderRadius: 4 }]
+            datasets: [{ label: 'Walk Hours', data: trainingData.map(d => d.training.toFixed(2)), backgroundColor: '#3b82f6', borderRadius: 4 }]
           },
           options: { responsive: true, maintainAspectRatio: true, scales: { y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }, x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } } }, plugins: { legend: { display: false } } }
         });
@@ -886,7 +886,7 @@ function handleFileUpload(file) {
     if (!projectData) return;
     const currentDay = projectData.weeks[Object.keys(projectData.weeks).sort((a,b) => a-b).pop()].days[projectData.weeks[Object.keys(projectData.weeks).sort((a,b) => a-b).pop()].days.length - 1];
     const totalDays = projectData.cumulativeStats.totalDays;
-    document.getElementById('dayFooter').textContent = `Day ${currentDay.dayNum} Complete | ${totalDays}/${totalDays} Unbroken Training Days`;
+    document.getElementById('dayFooter').textContent = `Day ${currentDay.dayNum} Complete | ${totalDays}/${totalDays} Unbroken Walking Days`;
     document.getElementById('projectTotalsTitle').textContent = `PROJECT TOTALS (${totalDays} DAYS)`;
   }
   // updateFooterDisplay and backupVersion are called inside init() after data loads
