@@ -364,7 +364,11 @@
         </div>
 
         <div class="story-box">
-          <div class="story-title purple" id="dayStoryTitle">DAY X STORY</div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <button id="prevStoryBtn" onclick="prevStory()" style="background:none;border:none;color:#e2e8f0;font-size:16px;cursor:pointer;padding:0 8px;line-height:1;flex-shrink:0;opacity:0.55;" title="Previous day">&#8249;</button>
+            <div id="dayStoryTitle" style="margin:0;text-align:center;flex:1;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#c084fc;">DAY X STORY</div>
+            <button id="nextStoryBtn" onclick="nextStory()" style="background:none;border:none;color:#e2e8f0;font-size:16px;cursor:pointer;padding:0 8px;line-height:1;flex-shrink:0;opacity:0.55;" title="Next day">&#8250;</button>
+          </div>
           <div class="story-content" id="dayStory" style="white-space: pre-wrap; overflow-wrap: break-word;">Loading...</div>
         </div>
 
@@ -475,16 +479,17 @@ let projectData = null;
 fetch('DATA_LOG.json')
   .then(response => response.json())
   .then(data => {
-      loadProjectData(data);
+    loadProjectData(data);
   })
   .catch(err => {
-      console.error("Failed to load DATA_LOG.json:", err);
+    console.error('Failed to load DATA_LOG.json:', err);
   });
 
 function loadProjectData(data) {
   projectData = data;
   document.getElementById('no-data-banner').style.display = 'none';
   init();
+  initStoryNavigation();
 }
 
 function handleFileUpload(file) {
@@ -890,6 +895,42 @@ function handleFileUpload(file) {
     document.getElementById('projectTotalsTitle').textContent = `PROJECT TOTALS (${totalDays} DAYS)`;
   }
   // updateFooterDisplay and backupVersion are called inside init() after data loads
+
+  // Story Navigation
+  let storyDays = [];
+  let storyIndex = 0;
+
+  function initStoryNavigation() {
+    const allDays = [];
+    Object.values(projectData.weeks || {}).forEach(week => {
+      (week.days || []).forEach(day => allDays.push(day));
+    });
+    storyDays = allDays.sort((a, b) => a.dayNum - b.dayNum);
+    storyIndex = storyDays.length - 1;
+    renderStory();
+  }
+
+  function renderStory() {
+    const day = storyDays[storyIndex];
+    if (!day) return;
+    const text = day.vibe || day.personalInsights || day.dailySummary || 'Story not available.';
+    document.getElementById('dayStoryTitle').textContent = `DAY ${day.dayNum} STORY`;
+    document.getElementById('dayStory').textContent = text;
+    const prevBtn = document.getElementById('prevStoryBtn');
+    const nextBtn = document.getElementById('nextStoryBtn');
+    prevBtn.disabled = storyIndex === 0;
+    prevBtn.style.opacity = storyIndex === 0 ? '0.15' : '0.55';
+    nextBtn.disabled = storyIndex === storyDays.length - 1;
+    nextBtn.style.opacity = storyIndex === storyDays.length - 1 ? '0.15' : '0.55';
+  }
+
+  function prevStory() {
+    if (storyIndex > 0) { storyIndex--; renderStory(); }
+  }
+
+  function nextStory() {
+    if (storyIndex < storyDays.length - 1) { storyIndex++; renderStory(); }
+  }
 
   </script>
 </body>
