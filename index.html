@@ -111,9 +111,12 @@
     .buttons-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     .btn { border: 1px solid #334155; border-radius: 8px; padding: 12px 16px; text-sm; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s; background: #1e293b; color: white; min-height: 56px; }
     .btn:hover { background: rgba(51, 65, 85, 0.6); }
-    .btn.active { background: #1e40af; border-color: #2563eb; color: white; }
-    .btn.active.recovery { background: #166534; border-color: #16a34a; }
-    .btn.active.analytics { background: #6b21a8; border-color: #9333ea; }
+    .btn.active { background: #1d4ed8; border-color: #2563eb; color: white; }
+    .btn.active.recovery { background: #16a34a; border-color: #15803d; }
+    .btn.active.analytics { background: #7c3aed; border-color: #9333ea; }
+    .btn.active.trends { background: #d97706; border-color: #b45309; }
+    .btn.active.history { background: #0d9488 !important; border-color: #0f766e !important; }
+    .btn.btn-history { background: rgba(13,148,136,0.12); border-color: #334155; color: #ffffff; }
     .btn-full { grid-column: 1 / -1; width: 100%; }
     .btn svg { width: 18px; height: 18px; }
     
@@ -153,13 +156,15 @@
     .chart-canvas { max-height: 300px; }
     
     /* Analysis Box */
-    .analysis-box { border-radius: 8px; padding: 16px; margin-bottom: 16px; font-size: 12px; color: #cbd5e1; line-height: 1.6; }
-    .analysis-box.blue { background: rgba(59, 130, 246, 0.15); border: 1px solid #3b82f6; }
+    .analysis-box { border-radius: 8px; padding: 16px; margin-bottom: 16px; font-size: 12px; color: #cbd5e1; line-height: 1.6; border-left: 3px solid; border-top: none; border-right: none; border-bottom: none; }
+    .analysis-box.blue { background: rgba(59, 130, 246, 0.1); border-left-color: #3b82f6; }
     .analysis-box.blue .box-title { color: #93c5fd; }
-    .analysis-box.emerald { background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; }
+    .analysis-box.emerald { background: rgba(16, 185, 129, 0.1); border-left-color: #10b981; }
     .analysis-box.emerald .box-title { color: #6ee7b7; }
-    .analysis-box.red { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; }
+    .analysis-box.red { background: rgba(239, 68, 68, 0.1); border-left-color: #ef4444; }
     .analysis-box.red .box-title { color: #fca5a5; }
+    .analysis-box.purple { background: rgba(167,139,250,0.08); border-left-color: #a78bfa; }
+    .analysis-box.purple .box-title { color: #a78bfa; }
     .box-title { font-weight: 700; text-transform: uppercase; margin-bottom: 8px; font-size: 13px; }
     
     /* Footer */
@@ -239,20 +244,25 @@
       </div>
 
       <!-- Quick Stats -->
-      <div class="quick-stats">
+      <div class="quick-stats" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
         <div class="quick-stat-card">
-          <div class="quick-stat-label">WALK SESSION</div>
-          <div class="quick-stat-value"><span id="totalTrainingHours">116</span>h<br><span id="totalTrainingMinutes">41</span>m</div>
-          <div class="quick-stat-unit" id="totalDistance">535.61 km</div>
+          <div class="quick-stat-label">WALKING TIME</div>
+          <div class="quick-stat-value"><span id="totalTrainingHours">—</span>h <span id="totalTrainingMinutes">—</span>m</div>
+          <div class="quick-stat-unit">total hours walked</div>
+        </div>
+        <div class="quick-stat-card">
+          <div class="quick-stat-label">DISTANCE</div>
+          <div class="quick-stat-value" id="totalDistance">—</div>
+          <div class="quick-stat-unit">km covered</div>
         </div>
         <div class="quick-stat-card">
           <div class="quick-stat-label">CONSISTENCY</div>
-          <div class="quick-stat-value accent" id="consistency">--</div>
+          <div class="quick-stat-value accent" id="consistency">—</div>
           <div class="quick-stat-unit">unbroken<br>walking</div>
         </div>
         <div class="quick-stat-card">
           <div class="quick-stat-label">CALORIES</div>
-          <div class="quick-stat-value" id="totalCalories">--</div>
+          <div class="quick-stat-value" id="totalCalories">—</div>
           <div class="quick-stat-unit">burned</div>
         </div>
       </div>
@@ -330,6 +340,14 @@
           <span>View Analytics</span>
         </button>
       </div>
+      <div class="buttons-container">
+        <button class="btn btn-full btn-history" id="fullHistoryBtn" onclick="toggleFullHistory()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span>View Full History — all <span id="historyDayCount">—</span> days</span>
+        </button>
+      </div>
 
       <!-- Performance Section -->
       <div class="analysis-section" id="performanceSection">
@@ -378,34 +396,92 @@
         </div>
       </div>
 
-      <!-- Analytics Section -->
+      <!-- Analytics Section — this week only -->
       <div class="analysis-section" id="analyticsSection">
+
         <div class="chart-container">
-          <div class="chart-title">WALK SESSION OVERVIEW</div>
+          <div class="chart-title">WALK SESSION OVERVIEW — THIS WEEK</div>
           <canvas id="trainingChart" class="chart-canvas"></canvas>
         </div>
         <div class="analysis-box blue">
-          <div class="box-title">💙 RECOVERY BALANCE ANALYSIS</div>
-          <p>Your walk session averages <span id="avgTraining">1.17</span>h per day, paired with <span id="recoveryBalance">80.9</span>% sleep restfulness. This balance indicates your body is recovering efficiently between walks.</p>
+          <div class="box-title">💙 WALKING — THIS WEEK</div>
+          <p>This week's walks averaged <span id="avgTraining">—</span> hours per day, with sleep restfulness at <span id="recoveryBalance">—</span>%. When walking time and sleep quality are both consistent, the body gets the work and the rest it needs. That balance is what drives progress.</p>
         </div>
 
         <div class="chart-container">
-          <div class="chart-title">DAILY CALORIC DEFICIT</div>
+          <div class="chart-title">DAILY CALORIC DEFICIT — THIS WEEK</div>
           <canvas id="deficitChart" class="chart-canvas"></canvas>
         </div>
         <div class="analysis-box emerald">
-          <div class="box-title">💚 CALORIC CONSISTENCY ANALYSIS</div>
-          <p>You've maintained an average daily deficit of <span id="avgDeficit">1,265</span> kcal, with <span id="deficitConsistency">84</span>% of days exceeding 1200 kcal. This consistency is the foundation of your weight loss.</p>
+          <div class="box-title">💚 DEFICIT — THIS WEEK</div>
+          <p>This week's average daily calorie gap was <span id="avgDeficit">—</span> kcal, with <span id="deficitConsistency">—</span>% of days exceeding 1,200 kcal. Eating less than the body burns, day after day, is what moves the weight. This number shows that is happening.</p>
         </div>
 
         <div class="chart-container">
-          <div class="chart-title">RESTING HEART RATE TREND</div>
+          <div class="chart-title">RESTING HEART RATE — THIS WEEK</div>
           <canvas id="heartRateChart" class="chart-canvas"></canvas>
         </div>
         <div class="analysis-box red">
-          <div class="box-title">❤️ HEART ADAPTATION ANALYSIS</div>
-          <p>Your resting heart rate has shifted from <span id="day1HR">100</span> bpm on Day 1 to <span id="currentHR">84</span> bpm today. This <span id="hrDrop">16</span> bpm drop is significant – your cardiovascular system is becoming more efficient.</p>
+          <div class="box-title">❤️ HEART RATE — THIS WEEK</div>
+          <p>The resting heart rate on Day 1 was <span id="day1HR">100</span> bpm. Today it is <span id="currentHR">—</span> bpm — a drop of <span id="hrDrop">—</span> bpm. A lower resting heart rate means the heart is working less hard to keep the body going. It is one of the clearest signs that the body is getting stronger.</p>
         </div>
+
+      </div>
+
+      <!-- Full History Section -->
+      <div class="analysis-section" id="fullHistorySection">
+        <div class="analysis-title" style="color: #0d9488; margin-bottom: 16px;">FULL PROJECT — ALL <span id="allTotalDays">—</span> DAYS</div>
+
+        <div class="chart-container">
+          <div class="chart-title">DAILY WALKING — ALL DAYS (HOURS)</div>
+          <canvas id="allTrainingChart" class="chart-canvas"></canvas>
+        </div>
+        <div class="analysis-box blue">
+          <div class="box-title">💙 WALKING — FULL PROJECT</div>
+          <p>Every walking session across the full project. Rest days show as zero. The shape of this chart tells the story — the early weeks building routine, the long days when the weather was good, and the deliberate rest days around treatment. Average walking time per training day: <span id="allAvgWalk">—</span> hours.</p>
+        </div>
+
+        <div class="chart-container">
+          <div class="chart-title">DAILY CALORIC DEFICIT — ALL DAYS</div>
+          <canvas id="allDeficitChart" class="chart-canvas"></canvas>
+        </div>
+        <div class="analysis-box emerald">
+          <div class="box-title">💚 DEFICIT — FULL PROJECT</div>
+          <p>Every day's calorie gap across the full project. The overall average is <span id="allAvgDeficit">—</span> kcal per day. Days where the gap is smaller are typically rest days or treatment days — the body needed more fuel, and that was the right call. Consistency across all <span id="allDeficitDays">—</span> days is more important than any single number.</p>
+        </div>
+
+        <div class="chart-container">
+          <div class="chart-title">RESTING HEART RATE — ALL DAYS (BPM)</div>
+          <canvas id="allHRChart" class="chart-canvas"></canvas>
+        </div>
+        <div class="analysis-box red">
+          <div class="box-title">❤️ HEART RATE — FULL PROJECT</div>
+          <p>The resting heart rate on Day 1 was <span id="allDay1HR">—</span> bpm. Today it is <span id="allCurrentHR">—</span> bpm. That is a drop of <span id="allHRDrop">—</span> bpm over <span id="allHRDays">—</span> days — the clearest single number showing what this project has done for the heart. The downward slope in this chart is the body getting stronger, one day at a time.</p>
+        </div>
+
+        <div class="chart-container">
+          <div class="chart-title">MOOD — ALL DAYS (0–10 SCALE)</div>
+          <div style="display: grid; grid-template-columns: auto auto auto; gap: 8px 16px; margin-bottom: 12px; width: 100%;">
+            <span style="display: flex; align-items: center; gap: 5px; font-size: 10px; color: #94a3b8;">
+              <span style="width: 16px; height: 2px; background: #7c3aed; display: inline-block; border-radius: 1px; flex-shrink: 0;"></span>
+              Daily mood
+            </span>
+            <span style="display: flex; align-items: center; gap: 5px; font-size: 10px; color: #94a3b8;">
+              <span style="width: 16px; height: 2px; background: #10b981; display: inline-block; border-radius: 1px; flex-shrink: 0;"></span>
+              7-day average
+            </span>
+            <span style="display: flex; align-items: center; gap: 5px; font-size: 10px; color: #94a3b8;">
+              <svg width="8" height="8" viewBox="0 0 8 8" style="flex-shrink: 0;"><circle cx="4" cy="4" r="4" fill="#f97316"/></svg>
+              Spravato day
+            </span>
+          </div>
+          <canvas id="allMoodChart" class="chart-canvas"></canvas>
+        </div>
+        <div class="analysis-box purple">
+          <div class="box-title">💜 MOOD — FULL PROJECT</div>
+          <p>Mood on Day 1 was <span id="allDay1Mood">—</span>/10. The current mood is <span id="allCurrentMood">—</span>/10 — a rise of <span id="allMoodRise">—</span> points. The floor has risen. That is what matters.</p>
+        </div>
+
       </div>
 
       <!-- Trends Section -->
@@ -420,7 +496,7 @@
             <div class="analysis-item-label" style="margin-top: 4px;">bpm</div>
           </div>
           <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;" id="trendsRHRComp">This week: 81.7 | Last week: 84.3 | Change: -2.6 bpm (-3.1%)</div>
-          <div style="font-size: 12px; color: #e2e8f0; line-height: 1.5; margin-top: 8px;" id="trendsRHRInt">IMPROVING: Your heart is recovering better. It's working 2.6 bpm less hard at baseline, showing your cardiovascular system adapted well to daily walking.</div>
+          <div style="font-size: 12px; color: #e2e8f0; line-height: 1.5; margin-top: 8px;" id="trendsRHRInt">IMPROVING: Your heart is recovering better. It's working 2.6 bpm less hard at rest, showing the body has adjusted well to daily walking.</div>
         </div>
         
         <!-- Daily Drift -->
@@ -431,18 +507,18 @@
             <div class="analysis-item-label" style="margin-top: 4px;">bpm average</div>
           </div>
           <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;" id="trendsDriftPattern">Pattern: EXCELLENT</div>
-          <div style="font-size: 12px; color: #e2e8f0; line-height: 1.5; margin-top: 8px;" id="trendsDriftInt">EXCELLENT: Your evening heart rate is lower than morning, showing excellent recovery. Your nervous system is calming down through the day—not accumulating stress.</div>
+          <div style="font-size: 12px; color: #e2e8f0; line-height: 1.5; margin-top: 8px;" id="trendsDriftInt">EXCELLENT: Your evening heart rate is lower than morning, showing excellent recovery. The body is settling down through the day — not carrying stress into the evening.</div>
         </div>
         
         <!-- Sleep HRV -->
         <div style="margin-bottom: 16px; padding-bottom: 16px;">
-          <div class="analysis-item-label" style="text-transform: uppercase; color: #94a3b8;">◐ SLEEP HRV (NERVOUS SYSTEM RECOVERY)</div>
+          <div class="analysis-item-label" style="text-transform: uppercase; color: #94a3b8;">◐ SLEEP HRV (OVERNIGHT RECOVERY)</div>
           <div style="margin-top: 8px;">
             <div class="analysis-item-value" id="trendsHRVValue" style="color: #60a5fa;">16.0</div>
             <div class="analysis-item-label" style="margin-top: 4px;" id="trendsHRVUnit">ms</div>
           </div>
           <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;" id="trendsHRVPattern">Pattern: STABLE</div>
-          <div style="font-size: 12px; color: #e2e8f0; line-height: 1.5; margin-top: 8px;" id="trendsHRVInt">STABLE: Your parasympathetic (calm) nervous system is recovering consistently during sleep. No signs of over-exertion or stress-induced disruption.</div>
+          <div style="font-size: 12px; color: #e2e8f0; line-height: 1.5; margin-top: 8px;" id="trendsHRVInt">STABLE: The body is recovering consistently during sleep. No signs of overdoing it or stress building up overnight.</div>
         </div>
         
         <!-- Overall Pattern -->
@@ -609,7 +685,7 @@ function handleFileUpload(file) {
       document.getElementById('progressBar').style.width = Math.min(progressPercent, 100) + '%';
       document.getElementById('totalTrainingHours').textContent = projectData.cumulativeStats.totalTrainingHours;
       document.getElementById('totalTrainingMinutes').textContent = projectData.cumulativeStats.totalTrainingMinutes;
-      document.getElementById('totalDistance').textContent = projectData.cumulativeStats.totalDistance + ' km';
+      document.getElementById('totalDistance').textContent = projectData.cumulativeStats.totalDistance.toFixed(2);
       document.getElementById('consistency').textContent = projectData.cumulativeStats.totalDays + '/' + projectData.cumulativeStats.totalDays;
       document.getElementById('totalCalories').textContent = projectData.cumulativeStats.totalCalories.toLocaleString();
       
@@ -737,6 +813,8 @@ function handleFileUpload(file) {
       });
       
       setTimeout(() => initCharts(days), 100);
+      const hdc = document.getElementById('historyDayCount');
+      if (hdc) hdc.textContent = projectData.cumulativeStats.totalDays;
     }
 
     function togglePerformance() {
@@ -794,11 +872,27 @@ function handleFileUpload(file) {
       btn.insertBefore(svg, btn.firstChild);
     }
 
+    let historyChartsInitialised = false;
+    function toggleFullHistory() {
+      const section = document.getElementById('fullHistorySection');
+      const btn = document.getElementById('fullHistoryBtn');
+      const isShowing = section.classList.toggle('show');
+      btn.classList.toggle('active');
+      btn.classList.toggle('history');
+      const span = btn.querySelector('span');
+      if (span) span.textContent = isShowing ? 'Hide Full History' : 'View Full History';
+      if (isShowing && !historyChartsInitialised) {
+        historyChartsInitialised = true;
+        setTimeout(() => initAllHistoryCharts(), 50);
+      }
+    }
+
     function toggleTrends() {
       const section = document.getElementById('trendsSection');
       const btn = document.getElementById('trendsBtn');
       section.classList.toggle('show');
       btn.classList.toggle('active');
+      btn.classList.toggle('trends');
       btn.textContent = btn.classList.contains('active') ? 'Hide Trends' : 'View Trends';
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('viewBox', '0 0 24 24');
@@ -827,6 +921,7 @@ function handleFileUpload(file) {
     }
 
     const chartInstances = {};
+    let historyChartInstances = {};
 
     function initCharts(days) {
       if (!days || days.length === 0) return;
@@ -886,7 +981,220 @@ function handleFileUpload(file) {
 
     // init() is triggered by loadProjectData() after upload
   
-  // Update footer dynamically
+    function initAllHistoryCharts() {
+      if (!projectData) return;
+
+      // Build allDays — every day across all weeks, sorted by dayNum
+      const allDays = [];
+      Object.values(projectData.weeks || {}).forEach(week => {
+        (week.days || []).forEach(day => allDays.push(day));
+      });
+      allDays.sort((a, b) => a.dayNum - b.dayNum);
+      if (allDays.length === 0) return;
+
+      const labels = allDays.map(d => 'D' + d.dayNum);
+      const totalDays = allDays.length;
+
+      // --- Walking data (hours) ---
+      const walkData = allDays.map(d => {
+        if (!d.training || d.training.status !== 'complete') return 0;
+        const h = d.training.duration.match(/(\d+)h/);
+        const m = d.training.duration.match(/(\d+)m/);
+        return parseFloat(((h ? parseInt(h[1]) : 0) + (m ? parseInt(m[1]) : 0) / 60).toFixed(2));
+      });
+      const trainingDays = walkData.filter(v => v > 0);
+      const avgWalk = trainingDays.length > 0
+        ? (trainingDays.reduce((a, b) => a + b, 0) / trainingDays.length).toFixed(2)
+        : '0.00';
+
+      // --- Deficit data ---
+      const deficitData = allDays.map(d => d.nutrition ? d.nutrition.deficit : 0);
+      const avgDeficit = Math.round(deficitData.reduce((a, b) => a + b, 0) / deficitData.length);
+
+      // --- RHR data ---
+      const rhrData = allDays.map(d => {
+        if (!d.heartRate) return null;
+        if (d.heartRate.resting != null) return d.heartRate.resting;
+        if (d.heartRate.morningRestingHR != null) return d.heartRate.morningRestingHR;
+        if (d.heartRate.morningWakingBPM && d.heartRate.morningWakingBPM.value != null) return d.heartRate.morningWakingBPM.value;
+        return null;
+      });
+      const day1HR = rhrData[0] || projectData.benchmarks?.day1HR || 100;
+      const currentHR = rhrData[rhrData.length - 1] || rhrData.filter(Boolean).pop();
+      const hrDrop = day1HR - currentHR;
+
+      // --- Mood data ---
+      const moodData = allDays.map(d => d.mood != null ? d.mood : null);
+      const day1Mood = projectData.benchmarks?.day1Mood || 3.0;
+      const currentMood = moodData.filter(Boolean).pop();
+      const moodRise = (currentMood - day1Mood).toFixed(1);
+
+      // Treatment day markers for mood chart
+      const treatmentMoods = allDays.map(d => {
+        const isTreatment = d.treatment === 'SPRAVATO' ||
+          (d.medical && d.medical.treatment === 'SPRAVATO') ||
+          d.medicalTreatment === 'SPRAVATO';
+        return isTreatment && d.mood != null ? d.mood : null;
+      });
+
+      // 7-day rolling average for mood
+      const moodRolling = moodData.map((_, i) => {
+        const window = moodData.slice(Math.max(0, i - 3), i + 4).filter(v => v != null);
+        return window.length > 0
+          ? Math.round((window.reduce((a, b) => a + b, 0) / window.length) * 10) / 10
+          : null;
+      });
+
+      // Update analysis text
+      const projectTotalDays = projectData.cumulativeStats.totalDays;
+      document.getElementById('allTotalDays').textContent = projectTotalDays;
+      document.getElementById('allAvgWalk').textContent = avgWalk;
+      document.getElementById('allAvgDeficit').textContent = avgDeficit.toLocaleString();
+      document.getElementById('allDeficitDays').textContent = projectTotalDays;
+      document.getElementById('allDay1HR').textContent = day1HR;
+      document.getElementById('allCurrentHR').textContent = currentHR;
+      document.getElementById('allHRDrop').textContent = hrDrop;
+      document.getElementById('allHRDays').textContent = projectTotalDays;
+      document.getElementById('allDay1Mood').textContent = day1Mood;
+      document.getElementById('allCurrentMood').textContent = currentMood;
+      document.getElementById('allMoodRise').textContent = moodRise;
+
+      const chartOpts = (yMin, yMax, color) => ({
+        responsive: true,
+        maintainAspectRatio: true,
+        elements: { point: { radius: totalDays > 30 ? 0 : 3 } },
+        scales: {
+          y: { min: yMin, max: yMax, ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+          x: { ticks: { color: '#94a3b8', maxTicksLimit: 12, autoSkip: true }, grid: { color: '#334155' } }
+        },
+        plugins: { legend: { display: false } }
+      });
+
+      // Walking chart
+      const allTrainingCtx = document.getElementById('allTrainingChart');
+      if (allTrainingCtx) {
+        if (historyChartInstances.training) historyChartInstances.training.destroy();
+        historyChartInstances.training = new Chart(allTrainingCtx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              data: walkData,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59,130,246,0.08)',
+              borderWidth: 1.5,
+              fill: true,
+              tension: 0.3,
+              pointRadius: 0
+            }]
+          },
+          options: chartOpts(0, null, '#3b82f6')
+        });
+      }
+
+      // Deficit chart
+      const allDeficitCtx = document.getElementById('allDeficitChart');
+      if (allDeficitCtx) {
+        if (historyChartInstances.deficit) historyChartInstances.deficit.destroy();
+        historyChartInstances.deficit = new Chart(allDeficitCtx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              data: deficitData,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16,185,129,0.08)',
+              borderWidth: 1.5,
+              fill: true,
+              tension: 0.3,
+              pointRadius: 0
+            }]
+          },
+          options: chartOpts(0, null, '#10b981')
+        });
+      }
+
+      // HR chart
+      const allHRCtx = document.getElementById('allHRChart');
+      if (allHRCtx) {
+        if (historyChartInstances.hr) historyChartInstances.hr.destroy();
+        historyChartInstances.hr = new Chart(allHRCtx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              data: rhrData,
+              borderColor: '#ef4444',
+              backgroundColor: 'rgba(239,68,68,0.08)',
+              borderWidth: 1.5,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 0
+            }]
+          },
+          options: chartOpts(60, 105, '#ef4444')
+        });
+      }
+
+      // Mood chart
+      const allMoodCtx = document.getElementById('allMoodChart');
+      if (allMoodCtx) {
+        if (historyChartInstances.mood) historyChartInstances.mood.destroy();
+        historyChartInstances.mood = new Chart(allMoodCtx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Daily mood',
+                data: moodData,
+                borderColor: '#7c3aed',
+                backgroundColor: 'rgba(124,58,237,0.08)',
+                borderWidth: 1.5,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 0,
+                order: 2
+              },
+              {
+                label: '7-day average',
+                data: moodRolling,
+                borderColor: '#10b981',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4,
+                pointRadius: 0,
+                order: 1
+              },
+              {
+                label: 'SPRAVATO day',
+                data: treatmentMoods,
+                borderColor: 'transparent',
+                backgroundColor: '#f97316',
+                pointBackgroundColor: '#f97316',
+                pointBorderColor: '#f97316',
+                pointBorderWidth: 0,
+                pointRadius: 4,
+                pointStyle: 'circle',
+                showLine: false,
+                order: 0
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+              y: { min: 3, max: 8, ticks: { color: '#94a3b8', stepSize: 1 }, grid: { color: '#334155' } },
+              x: { ticks: { color: '#94a3b8', maxTicksLimit: 12, autoSkip: true }, grid: { color: '#334155' } }
+            },
+            plugins: { legend: { display: false } }
+          }
+        });
+      }
+    }
+
+    // Update footer dynamically
   function updateFooterDisplay() {
     if (!projectData) return;
     const currentDay = projectData.weeks[Object.keys(projectData.weeks).sort((a,b) => a-b).pop()].days[projectData.weeks[Object.keys(projectData.weeks).sort((a,b) => a-b).pop()].days.length - 1];
